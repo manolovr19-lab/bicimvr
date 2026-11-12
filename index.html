@@ -104,6 +104,13 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
 :root[data-theme="sun"] #spd,:root[data-theme="sun"] #grade,:root[data-theme="sun"] .grid3 .v,:root[data-theme="sun"] #turn .dist{font-weight:800}
 :root[data-theme="sun"] .ctl button,:root[data-theme="sun"] .zoom button,:root[data-theme="sun"] .sbtn{border:2px solid #000}
 :root[data-theme="sun"] .nhd{border-bottom:2px solid #000}
+.dlw{position:absolute;inset:0;background:rgba(0,0,0,.65);z-index:6;display:none;align-items:center;justify-content:center}
+.dlw.on{display:flex}
+.dlbox{background:var(--panel);width:88%;max-width:380px;padding:12px 14px;border-left:4px solid var(--red);color:var(--tx)}
+.dlbox .t{font-size:20px;font-weight:800;font-style:italic}
+.dlbox .i{font-size:13px;color:var(--mut);margin:6px 0;line-height:1.25;letter-spacing:.02em}
+.dlbar{height:8px;background:var(--line);margin:8px 0}
+.dlbar i{display:block;height:100%;width:0;background:var(--red)}
 </style>
 </head>
 <body>
@@ -146,8 +153,9 @@ button{font-family:inherit;color:inherit;border:0;cursor:pointer}
     </div>
     <div id="off" class="cut"><div class="ar" id="oar" style="width:28px;height:28px"></div><div><div class="t" id="otxt">FUERA DE RUTA</div><div class="s" id="osub">Vuelve a la ruta</div></div></div>
     <svg id="north" viewBox="0 0 30 30"><g id="northg"><polygon points="15,2 22,24 15,19 8,24" fill="#D0161D"/><text x="15" y="30" font-size="8" text-anchor="middle" fill="currentColor" font-weight="700">N</text></g></svg>
-    <div class="zoom"><button id="mapb" class="cut-s" title="Mapa">🗺</button><button id="zin" class="cut-s">+</button><button id="zout" class="cut-s">−</button><button id="ctr" class="cut-s" title="Centrar">⌖</button></div>
+    <div class="zoom"><button id="dlb" class="cut-s" title="Descargar mapa">⬇</button><button id="mapb" class="cut-s" title="Mapa">🗺</button><button id="zin" class="cut-s">+</button><button id="zout" class="cut-s">−</button><button id="ctr" class="cut-s" title="Centrar">⌖</button></div>
     <div id="toast" class="cut-s"></div>
+    <div id="dlw" class="dlw"><div class="dlbox cut"><div class="t">Descargar mapa de la ruta</div><div class="i" id="dli">—</div><div class="dlbar"><i id="dlbar"></i></div><div class="ctl"><button id="dlgo" class="cut-s act">Descargar</button><button id="dlx" class="cut-s">Cerrar</button></div></div></div>
   </div>
   <div class="panel">
     <div class="row1">
@@ -671,6 +679,70 @@ $('mapb').onclick = () => {
 };
 window.addEventListener('offline', () => toast('Sin conexión: el mapa solo muestra lo que ya habías visto con internet.', 6000));
 
+// ---------- descarga de la franja de mapa de la ruta (despacio y con pausas) ----------
+const DL = { zooms: [14, 15, 16, 17], r: 400, running: false, cancel: false, list: [] };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function tileUrl(p, z, x, y){ return p.url.replace('{s}', p.sub[(x + y) % p.sub.length]).replace('{z}', z).replace('{x}', x).replace('{y}', y); }
+function dlList(){
+  const set = new Set(), dlat = DL.r / R.ky, dlon = DL.r / R.kx;
+  for (const z of DL.zooms){
+    const n = Math.pow(2, z);
+    for (let k = 0; k <= R.n; k += 8){
+      const lat = R.la0 + R.y[k] / R.ky, lon = R.lo0 + R.x[k] / R.kx;
+      const x0 = Math.floor(lon2x(lon - dlon, n)), x1 = Math.floor(lon2x(lon + dlon, n));
+      const y0 = Math.floor(lat2y(lat + dlat, n)), y1 = Math.floor(lat2y(lat - dlat, n));
+      for (let x = x0; x <= x1; x++) for (let y = y0; y <= y1; y++) set.add(z + '/' + x + '/' + y);
+    }
+  }
+  return [...set];
+}
+function dlOpen(){
+  if (!R) return;
+  const p = PROVIDERS[provIdx];
+  $('dlbar').style.width = '0';
+  $('dlgo').disabled = false; $('dlgo').textContent = 'Descargar';
+  if (!p.url || p.id === 'osm'){
+    $('dli').textContent = 'Elige antes CyclOSM u OpenTopoMap con el botón 🗺 (el servidor estándar de OpenStreetMap no admite descargas).';
+    $('dlgo').disabled = true;
+  } else {
+    DL.list = dlList();
+    $('dli').textContent = '≈ ' + DL.list.length + ' teselas (unos ' + Math.round(DL.list.length * 0.02) + ' MB) de ' + p.name + ', a ±' + DL.r + ' m de la ruta. Hazlo con wifi, una sola vez; va despacio (unos minutos) para no cargar el servidor.';
+  }
+  $('dlw').classList.add('on');
+}
+async function dlRun(){
+  if (DL.running){ DL.cancel = true; return; }
+  const p = PROVIDERS[provIdx]; if (!p.url || p.id === 'osm') return;
+  const list = DL.list.length ? DL.list : dlList(), total = list.length;
+  DL.running = true; DL.cancel = false; $('dlgo').textContent = 'Parar';
+  let i = 0, done = 0, fail = 0;
+  const upd = () => { $('dlbar').style.width = (100 * (done + fail) / total).toFixed(0) + '%'; $('dli').textContent = 'Descargando… ' + (done + fail) + ' / ' + total + (fail ? ' (' + fail + ' fallos)' : ''); };
+  const worker = async () => {
+    while (i < list.length && !DL.cancel){
+      const [z, x, y] = list[i++].split('/').map(Number), url = tileUrl(p, z, x, y);
+      let have = false; try { have = !!(window.caches && await caches.match(url, { ignoreVary: true })); } catch(e){}
+      if (have){ done++; }
+      else {
+        await new Promise(res => {
+          const im = new Image(); im.crossOrigin = 'anonymous';
+          im.onload = () => { done++; res(); };
+          im.onerror = () => { if (im.crossOrigin){ im.removeAttribute('crossorigin'); im.src = url; } else { fail++; res(); } };
+          im.src = url;
+        });
+        await sleep(250);
+      }
+      if ((done + fail) % 5 === 0) upd();
+    }
+  };
+  await worker();   // una sola petición a la vez, con pausa
+  upd(); DL.running = false;
+  $('dli').textContent = DL.cancel ? 'Parado: ' + done + ' teselas guardadas.' : (fail > total * 0.3 ? 'Terminó con muchos fallos (' + fail + '). Comprueba la conexión e inténtalo otra vez.' : 'Listo: ' + done + ' teselas guardadas' + (fail ? ' (' + fail + ' fallos)' : '') + '. Ya puedes usar el mapa sin conexión en esta ruta.');
+  $('dlgo').textContent = 'Descargar';
+}
+$('dlb').onclick = dlOpen;
+$('dlgo').onclick = dlRun;
+$('dlx').onclick = () => { if (DL.running) DL.cancel = true; $('dlw').classList.remove('on'); };
+
 // ---------- mapa ----------
 function redraw(){ if ($('nav').classList.contains('on')) { draw(); drawProfile(); } }
 function draw(){
@@ -748,7 +820,7 @@ $('ctr').onclick = () => {
 let drag = null;
 const mw = $('mapwrap');
 mw.addEventListener('pointerdown', ev => {
-  if (ev.target.closest('button,#turn,#off')) return;
+  if (ev.target.closest('button,#turn,#off,#dlw')) return;
   drag = { x: ev.clientX, y: ev.clientY }; mw.setPointerCapture(ev.pointerId);
 });
 mw.addEventListener('pointermove', ev => {

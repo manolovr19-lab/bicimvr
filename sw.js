@@ -1,8 +1,8 @@
-const CORE = 'bicimvr-v3';
+const CORE = 'bicimvr-v4';
 const CORE_FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const TILE_HOSTS = /(^|\.)tile\.openstreetmap\.org$|(^|\.)tile-cyclosm\.openstreetmap\.fr$|(^|\.)tile\.opentopomap\.org$/;
 const PERIOD = 14 * 24 * 3600 * 1000;      // las teselas se guardan >= 14 dias (el minimo exigido es 7)
-const MAX_TILES = 3000;
+const MAX_TILES = 8000;
 const tileCache = off => 'tiles-' + (Math.floor(Date.now() / PERIOD) - off);
 
 self.addEventListener('install', e => { e.waitUntil(caches.open(CORE).then(c => c.addAll(CORE_FILES)).then(() => self.skipWaiting())); });

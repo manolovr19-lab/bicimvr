@@ -1,4 +1,4 @@
-BiciMVR v3 - 6 archivos que hay que subir JUNTOS, en la misma carpeta:
+BiciMVR v4 - 6 archivos que hay que subir JUNTOS, en la misma carpeta:
 index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png, apple-touch-icon.png
 
 ACTUALIZAR EN GITHUB (sustituir la version anterior):
@@ -8,9 +8,10 @@ ACTUALIZAR EN GITHUB (sustituir la version anterior):
 4. Espera 1-2 minutos a que se actualice la pagina (pestana Actions, o Settings > Pages).
 5. En el movil: cierra la app del todo, abrela con internet, cierrala y vuelve a abrirla (la segunda vez ya carga la version nueva).
 
-NOVEDADES v3
+NOVEDADES v4
 - Interfaz mas compacta: el mapa ocupa mas pantalla.
 - Ruta y perfil coloreados por pendiente (azul bajada, verde llano, amarillo/naranja subida, rojo rampa dura).
 - Iconos de giro con su forma (izquierda, derecha, cerrado, cambio de sentido).
 - Tema sol directo (boton ◐ alterna oscuro / claro / sol).
 - Mapa de fondo (boton del mapa) con cache para usar sin conexion lo ya visto.
+- NUEVO: boton ⬇ = descarga la franja de mapa de la ruta (±400 m) para usarla sin conexion. Hazlo en casa con wifi, con la ruta cargada y CyclOSM u OpenTopoMap elegido. Va despacio a proposito. Hazlo el dia antes de salir; con la app instalada en pantalla de inicio el movil no la borra.
