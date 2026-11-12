@@ -1,15 +1,16 @@
-BiciMVR (PWA) - 6 archivos que hay que subir JUNTOS, en la misma carpeta:
+BiciMVR v3 - 6 archivos que hay que subir JUNTOS, en la misma carpeta:
 index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png, apple-touch-icon.png
 
-GitHub Pages (desde casa o el iPhone):
-1. Crea un repositorio nuevo (por ejemplo "bicimvr") y subelo con "Add file > Upload files".
-2. Settings > Pages > Source: "Deploy from a branch" > rama main, carpeta /root > Save.
-3. En 1-2 minutos tendras https://TU_USUARIO.github.io/bicimvr/
-4. Abrelo en Safari del iPhone > Compartir > "Anadir a pantalla de inicio".
-5. Abre la app UNA VEZ con internet para que se guarde para uso sin conexion.
+ACTUALIZAR EN GITHUB (sustituir la version anterior):
+1. Entra en tu repositorio "bicimvr" en github.com.
+2. Add file > Upload files, y elige los 6 archivos (con el MISMO nombre que los que ya hay).
+3. Commit changes. GitHub sustituye los antiguos.
+4. Espera 1-2 minutos a que se actualice la pagina (pestana Actions, o Settings > Pages).
+5. En el movil: cierra la app del todo, abrela con internet, cierrala y vuelve a abrirla (la segunda vez ya carga la version nueva).
 
-MAPA DE FONDO (version 2)
-- Boton del mapa (esquina inferior derecha): CyclOSM (bici) / OpenStreetMap / OpenTopoMap / sin mapa.
-- Necesita internet para ver teselas nuevas. Lo que ya has visto se guarda unas 2-4 semanas y se ve sin conexion.
-- Para llevarlo cargado: con wifi, abre la ruta y haz zoom/arrastra por el trazado antes de salir.
-- Si actualizas desde la version 1: sube los 6 archivos otra vez y abre la app con internet un par de veces.
+NOVEDADES v3
+- Interfaz mas compacta: el mapa ocupa mas pantalla.
+- Ruta y perfil coloreados por pendiente (azul bajada, verde llano, amarillo/naranja subida, rojo rampa dura).
+- Iconos de giro con su forma (izquierda, derecha, cerrado, cambio de sentido).
+- Tema sol directo (boton ◐ alterna oscuro / claro / sol).
+- Mapa de fondo (boton del mapa) con cache para usar sin conexion lo ya visto.

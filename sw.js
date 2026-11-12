@@ -1,4 +1,4 @@
-const CORE = 'bicimvr-v2';
+const CORE = 'bicimvr-v3';
 const CORE_FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 const TILE_HOSTS = /(^|\.)tile\.openstreetmap\.org$|(^|\.)tile-cyclosm\.openstreetmap\.fr$|(^|\.)tile\.opentopomap\.org$/;
 const PERIOD = 14 * 24 * 3600 * 1000;      // las teselas se guardan >= 14 dias (el minimo exigido es 7)
