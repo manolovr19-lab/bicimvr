@@ -1,0 +1,15 @@
+BiciMVR (PWA) - 6 archivos que hay que subir JUNTOS, en la misma carpeta:
+index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png, apple-touch-icon.png
+
+GitHub Pages (desde casa o el iPhone):
+1. Crea un repositorio nuevo (por ejemplo "bicimvr") y subelo con "Add file > Upload files".
+2. Settings > Pages > Source: "Deploy from a branch" > rama main, carpeta /root > Save.
+3. En 1-2 minutos tendras https://TU_USUARIO.github.io/bicimvr/
+4. Abrelo en Safari del iPhone > Compartir > "Anadir a pantalla de inicio".
+5. Abre la app UNA VEZ con internet para que se guarde para uso sin conexion.
+
+MAPA DE FONDO (version 2)
+- Boton del mapa (esquina inferior derecha): CyclOSM (bici) / OpenStreetMap / OpenTopoMap / sin mapa.
+- Necesita internet para ver teselas nuevas. Lo que ya has visto se guarda unas 2-4 semanas y se ve sin conexion.
+- Para llevarlo cargado: con wifi, abre la ruta y haz zoom/arrastra por el trazado antes de salir.
+- Si actualizas desde la version 1: sube los 6 archivos otra vez y abre la app con internet un par de veces.
